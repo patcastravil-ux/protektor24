@@ -1,0 +1,112 @@
+
+:root{
+  --bg:#0a0e17; --card:#141a28; --card2:#1a2233; --line:#232d42;
+  --text:#e8ecf5; --muted:#8b95ab; --accent:#fbbf24; --accent2:#f97316;
+  --success:#22c55e; --danger:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;font-size:15px;line-height:1.45}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:14px;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 12px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+input[type=checkbox]{width:auto;accent-color:var(--accent);transform:scale(1.2)}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 5px}
+.muted{color:var(--muted);font-size:12.5px}
+.nowrap{white-space:nowrap}
+
+/* ---- Экраны входа ---- */
+.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px;background:radial-gradient(1000px 600px at 50% -10%,#1b2438 0%,var(--bg) 60%)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 26px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.card .logo{width:58px;height:58px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;box-shadow:0 8px 24px rgba(249,115,22,.35)}
+.card h2{font-size:22px;margin-bottom:5px}
+.error-text{color:var(--danger);font-size:13px;min-height:18px;margin-top:8px}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:700;margin-top:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#070b14;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn.small{display:inline-block;width:auto;padding:8px 14px;font-size:13px;margin-top:10px}
+.btn.danger{background:var(--danger);color:#fff}
+
+/* ---- Каркас ---- */
+#app-wrapper{display:none;max-width:1100px;margin:0 auto;padding:0 14px 90px}
+header.app{position:sticky;top:0;z-index:20;background:rgba(10,14,23,.97);border-bottom:1px solid var(--line);padding:12px 4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header.app .brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800}
+header.app .brand .dot{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:17px}
+.badge-user{margin-left:auto;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600}
+.badge-user button{background:none;color:var(--muted);margin-left:6px;font-size:13px}
+nav.tabs{display:flex;gap:6px;padding:10px 0;overflow-x:auto}
+.nav-btn{flex:1;min-width:90px;padding:11px 8px;border-radius:11px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13.5px;font-weight:600;white-space:nowrap}
+.nav-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#070b14;border-color:transparent}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fade .18s}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:14px}
+.panel h3{font-size:15px;margin-bottom:12px}
+.pill-wrap{display:flex;gap:7px;flex-wrap:wrap}
+.pill-btn{padding:8px 14px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:600}
+.pill-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#070b14;border-color:transparent}
+
+/* ---- Каталог и корзина ---- */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:9px}
+.service-item{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;transition:border-color .12s}
+.service-item:hover{border-color:var(--accent)}
+.service-name{font-size:13.5px;font-weight:600;margin-bottom:8px}
+.service-meta{display:flex;justify-content:space-between;align-items:center}
+.service-price{color:var(--accent);font-weight:800;font-size:15px}
+.service-add{font-size:12px;color:var(--muted)}
+.cart-empty{color:var(--muted);font-size:13.5px;text-align:center;padding:18px}
+.cart-item{display:flex;justify-content:space-between;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:8px}
+.cart-item-title{font-size:13.5px;font-weight:600}
+.cart-item-sub{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap}
+.cart-price-input{width:80px;padding:4px 7px;font-size:13px;font-weight:700;color:var(--accent);border-radius:7px}
+.qty-controls{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.qty-btn{width:30px;height:30px;border-radius:8px;background:var(--line);color:var(--text);font-size:16px;font-weight:700}
+.qty-val{min-width:20px;text-align:center;font-weight:700}
+.badge-warn{color:var(--accent);font-size:12px}
+.totals{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px;font-size:14px}
+.totals-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.totals-row.grand{font-size:18px;font-weight:800;color:var(--accent)}
+
+/* ---- Таблицы ---- */
+.table-wrap{overflow-x:auto}
+.table{width:100%;border-collapse:collapse;font-size:13.5px}
+.table th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:8px;border-bottom:1px solid var(--line)}
+.table td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.table tr:hover td{background:rgba(255,255,255,.02)}
+.empty-cell{text-align:center;color:var(--muted);padding:22px!important}
+.order-row{cursor:pointer}
+.inline-input{width:80px;padding:6px 8px;font-size:13px;border-radius:8px}
+.inline-input.narrow{width:64px}
+.mini-btn{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px;color:var(--text)}
+.mini-btn.danger{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.badge-admin{background:rgba(251,191,36,.15);color:var(--accent);font-size:10.5px;padding:2px 7px;border-radius:999px;font-weight:700}
+
+/* ---- Отчёты ---- */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:14px}
+.stat-card .val{font-size:19px;font-weight:800;color:var(--accent);margin-top:4px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:120px;padding-top:6px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.chart-bar{width:100%;max-width:44px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:6px 6px 3px 3px;min-height:4px}
+.chart-label{font-size:10.5px;color:var(--muted);margin-top:5px}
+.total-line{font-size:16px;margin-top:8px}
+
+/* ---- Модалка, тост ---- */
+#modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(4,7,13,.7);z-index:60;padding:16px}
+.modal-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;max-width:520px;width:100%;max-height:86vh;overflow:auto}
+.modal-card h3{margin-bottom:12px}
+.modal-photo{width:100%;max-width:280px;border-radius:10px;margin-bottom:12px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--success);color:#070b14;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;transition:all .25s;z-index:100;max-width:92vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ---- Мобилка ---- */
+@media(max-width:600px){
+  body{font-size:14px}
+  .panel{padding:14px}
+  .stat-card .val{font-size:16px}
+  .table{font-size:12.5px}
+}
+
+/* === СТАРТОВЫЕ СОСТОЯНИЯ ЭКРАНОВ (видны до выполнения JS) === */
+#access-screen{display:flex;}
+#login-screen,#app-wrapper{display:none;}

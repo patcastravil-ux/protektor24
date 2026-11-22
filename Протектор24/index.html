@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Протектор 24 — система учёта и отчётности шиномонтажа: заказ-наряды, зарплаты мастеров, отчёты и облачная синхронизация.">
+<meta name="theme-color" content="#0a0e17">
+<title>Протектор 24 — Учёт и отчётность шиномонтажа</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%99%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ======== ЭКРАН 1: КОД ДОСТУПА ======== -->
+<div id="access-screen" class="screen">
+  <div class="card">
+    <div class="logo">🔒</div>
+    <h2>Код доступа</h2>
+    <p class="muted" style="margin-top:6px">Введите общий код, чтобы открыть приложение</p>
+    <label style="margin-top:16px">Код (6 цифр)</label>
+    <input type="tel" id="access-code" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off" style="text-align:center;font-size:22px;letter-spacing:.5em">
+    <p id="access-error" class="error-text"></p>
+    <button class="btn" id="access-btn">🔓 Открыть</button>
+  </div>
+</div>
+
+<!-- ======== ЭКРАН 2: ВЫБОР СОТРУДНИКА ======== -->
+<div id="login-screen" class="screen">
+  <div class="card">
+    <div class="logo">⚙️</div>
+    <h2>Протектор 24</h2>
+    <p class="muted" style="margin-top:6px">Выберите сотрудника и введите PIN-код</p>
+    <label style="margin-top:16px">Пользователь</label>
+    <select id="login-user-select"></select>
+    <label>PIN-код (4–6 цифр)</label>
+    <input type="tel" id="login-pin-input" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off" style="text-align:center;letter-spacing:.3em">
+    <p id="login-error" class="error-text"></p>
+    <button class="btn" id="login-btn">🔓 Войти в систему</button>
+  </div>
+</div>
+
+<!-- ======== ПРИЛОЖЕНИЕ ======== -->
+<div id="app-wrapper">
+  <header class="app">
+    <div class="brand"><span class="dot">⚙️</span><span id="header-shop-title">Протектор 24</span></div>
+    <div style="text-align:right">
+      <div id="header-date" class="muted"></div>
+      <div id="header-shift-info" class="muted"></div>
+    </div>
+    <div class="badge-user"><span id="current-user-badge"></span><button onclick="logoutUser()" title="Выйти">🚪</button></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="nav-btn active" onclick="switchTab('order', this)">➕ Заказ</button>
+    <button class="nav-btn" onclick="switchTab('history', this)">📋 Журнал</button>
+    <button class="nav-btn" onclick="switchTab('reports', this)">📊 Отчёты</button>
+    <button class="nav-btn admin-only" id="nav-settings" onclick="switchTab('settings', this)">⚙️ Управление</button>
+  </nav>
+
+  <!-- ===== ТАБ: ЗАКАЗ ===== -->
+  <div id="tab-order" class="tab-content active">
+    <div class="panel">
+      <h3>1. Параметры автомобиля и клиента</h3>
+      <label>Госномер / Авто</label>
+      <input type="text" id="car-info" placeholder="А123ВС77 / Toyota Camry" autocomplete="off">
+      <label>Телефон / Имя клиента</label>
+      <input type="text" id="client-info" placeholder="+7 ... / Иван" autocomplete="off">
+      <label>Мастер заказа</label>
+      <select id="master-select"></select>
+      <label>Тип транспортного средства</label>
+      <div class="pill-wrap" id="car-type-pills">
+        <button class="pill-btn active" onclick="selectCarType('passenger', this)">🚗 Легковые</button>
+        <button class="pill-btn" onclick="selectCarType('suv', this)">🚙 Джипы / Кроссоверы</button>
+        <button class="pill-btn" onclick="selectCarType('commercial', this)">🚐 Коммерческий (до R17)</button>
+      </div>
+      <label>Диаметр колёс (радиус)</label>
+      <div class="pill-wrap" id="radius-pills"></div>
+      <p class="muted" style="margin-top:10px">📷 Фото-фиксация и ИИ-распознавание номера временно отключены — номер вписывается вручную.</p>
+    </div>
+
+    <div class="panel">
+      <h3>2. Выбор услуг</h3>
+      <div class="services-grid" id="services-catalog"></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0">🧾 Текущий заказ-наряд</h3>
+        <button class="mini-btn" id="clear-cart-btn">Очистить</button>
+      </div>
+      <div id="cart-list"></div>
+      <label>Скидка (%)</label>
+      <input type="number" id="discount-input" value="0" min="0" max="100" style="max-width:120px">
+      <label>Способ оплаты</label>
+      <select id="payment-select">
+        <option value="cash">💵 Наличные</option>
+        <option value="card">💳 Карта / Терминал / СБП</option>
+      </select>
+      <label>Комментарий к заказу</label>
+      <textarea id="order-comment" rows="2" placeholder="Примечания..."></textarea>
+      <div class="totals">
+        <div class="totals-row"><span>Подытог:</span><span id="subtotal-val">0 ₽</span></div>
+        <div class="totals-row"><span>Скидка:</span><span id="discount-val">0 ₽</span></div>
+        <div class="totals-row grand"><span>ИТОГО К ОПЛАТЕ:</span><span id="total-val">0 ₽</span></div>
+      </div>
+      <button class="btn" id="save-order-btn">✅ Оформить и сохранить заказ</button>
+    </div>
+  </div>
+
+  <!-- ===== ТАБ: ЖУРНАЛ ===== -->
+  <div id="tab-history" class="tab-content">
+    <div class="panel">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+        <h3 style="margin:0">📋 База заказов (<span id="history-count">0</span>)</h3>
+        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mini-btn" id="export-csv-btn">📥 Excel (CSV)</button>
+          <button class="mini-btn" id="print-btn">🖨 Печать</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <input type="text" id="history-search" placeholder="🔍 Поиск: номер, авто, клиент, мастер..." style="flex:1;min-width:180px">
+        <select id="history-filter" style="max-width:190px">
+          <option value="all">Всё время</option>
+          <option value="shift">Текущая смена</option>
+          <option value="week">Неделя</option>
+          <option value="month">Месяц</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>№ / Дата</th><th>Авто / Клиент</th><th>Параметры</th><th>Услуги</th><th>Мастер</th><th>Оплата</th><th>Сумма</th><th></th></tr></thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ТАБ: ОТЧЁТЫ ===== -->
+  <div id="tab-reports" class="tab-content">
+    <div class="panel">
+      <div class="pill-wrap" id="report-pills">
+        <button class="pill-btn active" onclick="setPeriod('shift', this)">🕒 Смена</button>
+        <button class="pill-btn" onclick="setPeriod('week', this)">📅 Неделя</button>
+        <button class="pill-btn" onclick="setPeriod('month', this)">🗓 Месяц</button>
+        <button class="pill-btn" onclick="setPeriod('all', this)">∞ Всё время</button>
+        <button class="mini-btn admin-only" id="close-shift-btn" style="margin-left:auto">🔄 Закрыть смену</button>
+      </div>
+    </div>
+
+    <div id="reports-admin">
+      <div class="stat-grid">
+        <div class="stat-card"><span class="muted">Общая выручка</span><div class="val" id="rep-total">0 ₽</div><span class="muted" id="rep-count">0 заказов</span></div>
+        <div class="stat-card"><span class="muted">Средний чек</span><div class="val" id="rep-avg">0 ₽</div></div>
+        <div class="stat-card"><span class="muted">Зарплата мастеров</span><div class="val" id="rep-salary">0 ₽</div><span class="muted">по ставкам</span></div>
+        <div class="stat-card"><span class="muted">Чистая прибыль кассы</span><div class="val" id="rep-profit">0 ₽</div></div>
+      </div>
+      <div class="panel">
+        <h3>💳 Разбивка по способам оплаты</h3>
+        <div class="totals-row"><span>💵 Наличные в кассе:</span><span id="rep-cash">0 ₽</span></div>
+        <div class="totals-row"><span>💳 Карта / Терминал / СБП:</span><span id="rep-card">0 ₽</span></div>
+      </div>
+      <div class="panel">
+        <h3>📈 Динамика выручки (последние 7 дней)</h3>
+        <div class="chart" id="rep-chart"></div>
+      </div>
+      <div class="panel">
+        <h3>👷 Выработка и зарплата по мастерам</h3>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Мастер</th><th>Ставка</th><th>Заказов</th><th>Выручка</th><th>База ЗП</th><th>К выплате</th></tr></thead>
+            <tbody id="rep-masters"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>🏆 Топ популярных услуг</h3>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Услуга</th><th>Кол-во</th><th>Выручка</th></tr></thead>
+            <tbody id="rep-top"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="reports-master" style="display:none">
+      <div class="stat-grid">
+        <div class="stat-card"><span class="muted">Мои заказы за период</span><div class="val" id="m-orders">0</div></div>
+        <div class="stat-card"><span class="muted">Моя выработка (работы)</span><div class="val" id="m-revenue">0 ₽</div></div>
+        <div class="stat-card"><span class="muted">Моя зарплата</span><div class="val" id="m-salary">0 ₽</div><span class="muted" id="m-pct-note"></span></div>
+      </div>
+      <div class="panel"><p class="muted">Статистика считается по текущей смене или выбранному периоду. Подробности заказов — во вкладке «Журнал».</p></div>
+    </div>
+  </div>
+
+  <!-- ===== ТАБ: УПРАВЛЕНИЕ ===== -->
+  <div id="tab-settings" class="tab-content admin-only">
+    <div class="panel">
+      <h3>👥 Аккаунты сотрудников и доступ</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Имя</th><th>Новый PIN</th><th>Ставка %</th><th></th></tr></thead>
+          <tbody id="accounts-body"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:flex-end">
+        <div style="flex:2;min-width:140px"><label style="margin-top:0">Имя мастера</label><input type="text" id="new-master-name" placeholder="Например: Дмитрий"></div>
+        <div style="flex:1;min-width:90px"><label style="margin-top:0">PIN 4–6 цифр</label><input type="tel" id="new-master-pin" inputmode="numeric" maxlength="6" placeholder="1234"></div>
+        <div style="width:80px"><label style="margin-top:0">Ставка %</label><input type="number" id="new-master-pct" value="30" min="0" max="100"></div>
+        <button class="btn small" id="add-master-btn" style="margin-top:0">+ Добавить</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0">💰 Редактор прайс-листа</h3>
+        <button class="mini-btn" id="reset-prices-btn">Сбросить к стандарту</button>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Услуга</th><th>База (₽)</th><th>Масштаб.</th><th>В ЗП</th></tr></thead>
+          <tbody id="price-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>⚙️ Настройки точки</h3>
+      <label>Название шиномонтажа (для чеков)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="shop-name-input">
+        <button class="btn small" id="save-shop-btn" style="margin-top:0">Сохранить</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>🌐 Общая база данных</h3>
+      <p class="muted" style="margin-bottom:10px">Нажмите «Создать» — сайт сам сделает общую базу и покажет код. Вставьте этот код на других устройствах — заказы будут появляться у всех сами.</p>
+      <p class="muted" id="cloud-status" style="margin-bottom:10px;font-weight:600">Не подключено</p>
+      <label>Код базы</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="text" id="cloud-code-input" placeholder="код базы" style="flex:1;min-width:150px">
+        <button class="btn small" id="copy-cloud-btn" style="margin-top:0">📋 Копировать</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button class="btn small" id="create-cloud-btn" style="margin-top:0">✨ Создать базу</button>
+        <button class="btn small secondary" id="connect-cloud-btn" style="margin-top:0">Подключить</button>
+        <button class="btn small danger" id="disconnect-cloud-btn" style="margin-top:0">Отключить</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>🗄 База данных</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn small secondary" id="download-backup-btn" style="margin-top:0">💾 Скачать бэкап (JSON)</button>
+        <label class="btn small secondary" style="margin-top:0;cursor:pointer">📂 Загрузить бэкап<input type="file" id="backup-file-input" accept=".json" style="display:none"></label>
+        <button class="btn small secondary" id="demo-orders-btn" style="margin-top:0">✨ Демо-заказы</button>
+        <button class="btn small danger" id="clear-orders-btn" style="margin-top:0">🗑 Очистить заказы</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== МОДАЛКА И ТОСТ ======== -->
+<div id="modal"><div class="modal-card"><div id="modal-body"></div><button class="btn secondary" id="modal-close" style="margin-top:16px">Закрыть</button></div></div>
+<div id="toast"></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
